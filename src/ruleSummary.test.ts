@@ -9,10 +9,15 @@ import {
   formatAppDisplayName,
   formatEventLabel,
   formatRelativeTime,
+  getEntryAddresses,
   getVisibleFilterEntries,
+  isAddressFilterKey,
   parseAppKey,
   sortAppsByDisplayName,
 } from './ruleSummary';
+
+const ADDRESS_A = 'QUE2MRfg3vgxdLxNfLbjBS9jsyBSujeVED';
+const ADDRESS_B = 'QUFqK5Xm2ur8vSmoUmvbSPr6xa9dS7B1n8';
 
 const RULE: NotificationManagerRule = {
   notificationId: 'direct-messages',
@@ -71,11 +76,22 @@ describe('formatAppDisplayName', () => {
   });
 });
 
+describe('isAddressFilterKey', () => {
+  it('recognizes exactly the four address filter keys', () => {
+    expect(isAddressFilterKey('address')).toBe(true);
+    expect(isAddressFilterKey('involving')).toBe(true);
+    expect(isAddressFilterKey('recipient')).toBe(true);
+    expect(isAddressFilterKey('sender')).toBe(true);
+    expect(isAddressFilterKey('txGroupId')).toBe(false);
+    expect(isAddressFilterKey('accountName')).toBe(false);
+  });
+});
+
 describe('getVisibleFilterEntries', () => {
   it('merges visible and masked filter keys into one sorted list', () => {
     expect(getVisibleFilterEntries(RULE)).toEqual([
-      { key: 'involving', masked: true },
-      { key: 'txGroupId', masked: false, value: 0 },
+      { isAddressFilter: true, key: 'involving', masked: true, partiallyMasked: false },
+      { isAddressFilter: false, key: 'txGroupId', masked: false, partiallyMasked: false, value: 0 },
     ]);
   });
 
@@ -84,6 +100,44 @@ describe('getVisibleFilterEntries', () => {
     const maskedEntry = entries.find((entry) => entry.key === 'involving');
 
     expect(maskedEntry).not.toHaveProperty('value');
+  });
+
+  it('flags a key as partially masked only when Home lists it in partiallyMaskedFilterKeys', () => {
+    const rule: NotificationManagerRule = {
+      ...RULE,
+      filters: { involving: [ADDRESS_A] },
+      maskedFilterKeys: [],
+      partiallyMaskedFilterKeys: ['involving'],
+    };
+
+    expect(getVisibleFilterEntries(rule)).toEqual([
+      { isAddressFilter: true, key: 'involving', masked: false, partiallyMasked: true, value: [ADDRESS_A] },
+    ]);
+  });
+});
+
+describe('getEntryAddresses', () => {
+  it('extracts address-shaped values from a visible address-filter entry', () => {
+    const entries = getVisibleFilterEntries({
+      ...RULE,
+      filters: { sender: ADDRESS_A, involving: [ADDRESS_A, ADDRESS_B], txGroupId: 0 },
+      maskedFilterKeys: [],
+    });
+
+    expect(getEntryAddresses(entries.find((entry) => entry.key === 'sender')!)).toEqual([ADDRESS_A]);
+    expect(getEntryAddresses(entries.find((entry) => entry.key === 'involving')!)).toEqual([ADDRESS_A, ADDRESS_B]);
+    expect(getEntryAddresses(entries.find((entry) => entry.key === 'txGroupId')!)).toEqual([]);
+  });
+
+  it('returns nothing for a masked entry, a non-address filter, or a non-address-shaped value', () => {
+    const entries = getVisibleFilterEntries({
+      ...RULE,
+      filters: { sender: 'not-an-address' },
+      maskedFilterKeys: ['recipient'],
+    });
+
+    expect(getEntryAddresses(entries.find((entry) => entry.key === 'sender')!)).toEqual([]);
+    expect(getEntryAddresses(entries.find((entry) => entry.key === 'recipient')!)).toEqual([]);
   });
 });
 

@@ -23,7 +23,7 @@ export const EN_STRINGS = {
 
   'permission.title': 'Allow Notify to manage app notifications',
   'permission.body':
-    'Notify reads a sanitized summary of every app’s notification grant and background rules, and can mute, unmute, remove rules for, or revoke any app. It cannot see delivered notifications, and Home always hides account bindings, wallet keys, addresses, contacts, and signatures.',
+    'Notify reads a sanitized summary of every app’s notification grant and background rules, and can mute, unmute, remove rules for, or revoke any app. Filter values that are valid Qortal addresses are shown with their published name and avatar when available; Home still hides account bindings, wallet keys, signatures, xpubs, and every other non-address filter value, and Notify never sees delivered notifications.',
   'permission.denied': 'Home denied the notification manager permission. You can try again at any time.',
 
   'global.title': 'App notifications',
@@ -61,6 +61,8 @@ export const EN_STRINGS = {
   'detail.rulesEmptyNoGrant': 'This app has no notification grant or background rules.',
   'detail.maskedFilters': 'Home hides some filter values from Notify:',
   'detail.maskedFilterChip': '{key}: hidden',
+  'detail.partiallyMaskedFilterChip': '+ hidden',
+  'detail.copyAddress': 'Copy address',
   'detail.event': 'Event',
   'detail.created': 'Added {date}',
   'detail.link': 'Opens',

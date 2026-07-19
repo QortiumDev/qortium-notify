@@ -2,7 +2,9 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import {
   AlertTriangle,
   Bell,
+  Check,
   ChevronLeft,
+  Copy,
   Loader2,
   RefreshCw,
   ShieldCheck,
@@ -19,6 +21,13 @@ import {
 } from './displaySettings';
 import { createTranslator, translatePlural, type TranslateFunction } from './i18n';
 import { getHomeSettings, parseHomeSettingsSnapshot, setAppNotificationsEnabled } from './homeSettings';
+import {
+  buildIdentityMap,
+  extractAddressesFromSummary,
+  isCurrentIdentityResponse,
+  resolveIdentities,
+  type IdentityResult,
+} from './identity';
 import {
   hasNotificationManagerPermission,
   getNotificationManagerSummary,
@@ -42,6 +51,7 @@ import {
   formatAppDisplayName,
   formatEventLabel,
   formatRelativeTime,
+  getEntryAddresses,
   getVisibleFilterEntries,
   sortAppsByDisplayName,
 } from './ruleSummary';
@@ -276,7 +286,80 @@ function AppRow({
   );
 }
 
+function AddressIdentity({
+  address,
+  identity,
+  t,
+}: {
+  address: string;
+  identity: IdentityResult | undefined;
+  t: TranslateFunction;
+}) {
+  const [avatarFailed, setAvatarFailed] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(
+    () => () => {
+      if (copiedTimeoutRef.current) {
+        clearTimeout(copiedTimeoutRef.current);
+      }
+    },
+    [],
+  );
+
+  const name = identity?.name ?? null;
+  const label = name ?? address;
+  const showAvatarImage = Boolean(identity?.avatarSrc) && !avatarFailed;
+  const monogram = label.trim().slice(0, 1).toUpperCase() || '?';
+
+  const copyAddress = useCallback(
+    (event: React.MouseEvent) => {
+      event.stopPropagation();
+
+      if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
+        return;
+      }
+
+      void navigator.clipboard
+        .writeText(address)
+        .then(() => {
+          setCopied(true);
+          if (copiedTimeoutRef.current) {
+            clearTimeout(copiedTimeoutRef.current);
+          }
+          copiedTimeoutRef.current = setTimeout(() => setCopied(false), 1500);
+        })
+        .catch(() => {});
+    },
+    [address],
+  );
+
+  return (
+    <span className="identity-chip" title={address}>
+      <span aria-hidden="true" className="identity-chip__avatar">
+        {showAvatarImage ? (
+          <img alt="" onError={() => setAvatarFailed(true)} src={identity?.avatarSrc ?? undefined} />
+        ) : (
+          monogram
+        )}
+      </span>
+      <span className="identity-chip__label">{label}</span>
+      <button
+        aria-label={t('detail.copyAddress')}
+        className="identity-chip__copy"
+        onClick={copyAddress}
+        title={t('detail.copyAddress')}
+        type="button"
+      >
+        {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
+      </button>
+    </span>
+  );
+}
+
 function RuleCard({
+  identityMap,
   language,
   now,
   onToggleSelect,
@@ -284,6 +367,7 @@ function RuleCard({
   selected,
   t,
 }: {
+  identityMap: Map<string, IdentityResult>;
   language: string;
   now: number;
   onToggleSelect: () => void;
@@ -318,17 +402,37 @@ function RuleCard({
       ) : null}
       {filterEntries.length > 0 ? (
         <div className="filter-chips">
-          {filterEntries.map((entry) =>
-            entry.masked ? (
-              <span className="filter-chip filter-chip--masked" key={entry.key}>
-                {t('detail.maskedFilterChip', { key: entry.key })}
+          {filterEntries.map((entry) => {
+            if (entry.masked) {
+              return (
+                <span className="filter-chip filter-chip--masked" key={entry.key}>
+                  {t('detail.maskedFilterChip', { key: entry.key })}
+                </span>
+              );
+            }
+
+            const addresses = getEntryAddresses(entry);
+
+            if (addresses.length === 0) {
+              return (
+                <span className="filter-chip" key={entry.key}>
+                  {entry.key}: {Array.isArray(entry.value) ? entry.value.join(', ') : String(entry.value)}
+                </span>
+              );
+            }
+
+            return (
+              <span className="filter-chip filter-chip--identity" key={entry.key}>
+                <span className="filter-chip__key">{entry.key}:</span>
+                {addresses.map((address) => (
+                  <AddressIdentity address={address} identity={identityMap.get(address)} key={address} t={t} />
+                ))}
+                {entry.partiallyMasked ? (
+                  <span className="filter-chip__partial">{t('detail.partiallyMaskedFilterChip')}</span>
+                ) : null}
               </span>
-            ) : (
-              <span className="filter-chip" key={entry.key}>
-                {entry.key}: {Array.isArray(entry.value) ? entry.value.join(', ') : String(entry.value)}
-              </span>
-            ),
-          )}
+            );
+          })}
         </div>
       ) : null}
     </li>
@@ -358,9 +462,11 @@ export default function App() {
   const [globalEnabled, setGlobalEnabled] = useState<boolean | null>(null);
   const [globalBusy, setGlobalBusy] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [identityMap, setIdentityMap] = useState<Map<string, IdentityResult>>(new Map());
   const latestSummaryRequestRef = useRef(0);
   const observedSummaryRevisionRef = useRef(-1);
   const permissionRequestRef = useRef(false);
+  const latestIdentityRequestRef = useRef(0);
 
   const managerSupported = useMemo(
     () => hasEveryAction(bridgeState.actions, NOTIFICATION_MANAGER_ACTIONS),
@@ -368,6 +474,10 @@ export default function App() {
   );
   const homeSettingsSupported = useMemo(
     () => hasAction(bridgeState.actions, 'GET_HOME_SETTINGS') && hasAction(bridgeState.actions, 'UPDATE_HOME_SETTINGS'),
+    [bridgeState.actions],
+  );
+  const identityResolutionSupported = useMemo(
+    () => hasAction(bridgeState.actions, 'RESOLVE_IDENTITIES'),
     [bridgeState.actions],
   );
 
@@ -543,6 +653,35 @@ export default function App() {
       })
       .catch(() => setGlobalEnabled(null));
   }, [bridgeLoaded, homeSettingsSupported]);
+
+  useEffect(() => {
+    if (!identityResolutionSupported || !summary) {
+      latestIdentityRequestRef.current += 1;
+      setIdentityMap(new Map());
+      return;
+    }
+
+    const addresses = extractAddressesFromSummary(summary);
+
+    if (addresses.length === 0) {
+      latestIdentityRequestRef.current += 1;
+      setIdentityMap(new Map());
+      return;
+    }
+
+    const requestId = ++latestIdentityRequestRef.current;
+
+    void resolveIdentities(addresses)
+      .then((results) => {
+        if (isCurrentIdentityResponse(requestId, latestIdentityRequestRef.current)) {
+          setIdentityMap(buildIdentityMap(results));
+        }
+      })
+      .catch(() => {
+        // A resolution failure just leaves addresses unresolved (rendered as
+        // plain text); it never blocks the rest of the summary from showing.
+      });
+  }, [identityResolutionSupported, summary]);
 
   const selectApp = useCallback((appKey: string | null) => {
     setSelectedAppKey(appKey);
@@ -878,6 +1017,7 @@ export default function App() {
                         <ul className="rule-list">
                           {selectedApp.rules.map((rule) => (
                             <RuleCard
+                              identityMap={identityMap}
                               key={rule.notificationId}
                               language={displaySettings.language}
                               now={now}
