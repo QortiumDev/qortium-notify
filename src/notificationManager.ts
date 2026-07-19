@@ -26,6 +26,10 @@ export type NotificationManagerRule = {
   link?: string;
   maskedFilterKeys: string[];
   notificationId: string;
+  // Present when a mixed array filter (e.g. `involving`) had some — but not
+  // all — of its values omitted by Home's masking; the key stays in
+  // `filters` with only the values Home judged safe to expose.
+  partiallyMaskedFilterKeys?: string[];
   text?: string;
   title?: string;
 };

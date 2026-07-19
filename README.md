@@ -32,7 +32,12 @@ notifications switch.
   when the host exposes it.
 - Masked filter values are always shown as a hidden chip, never guessed at or
   hidden entirely — Notify surfaces exactly what Home tells it was masked
-  (`maskedFilterKeys`), never the underlying address, contact, or signature.
+  (`maskedFilterKeys`), never the underlying contact, signature, or stored
+  binding. Filter values that validate as Qortal addresses (`address`,
+  `involving`, `recipient`, `sender`) are the one exception: Home exposes
+  those, and Notify shows each as a published name/avatar (falling back to
+  the full address) resolved through `RESOLVE_IDENTITIES`, with the address
+  always available as accessible text and a copy action.
 - Deep-linkable selection (`?app=<appKey>`), kept in sync with the browser
   History API so Home's address bar and Back/Forward track the open app
   detail view.
@@ -47,7 +52,7 @@ actions above. Notify has no useful standalone-browser mode: opening it
 outside Home shows an explanatory card, since every real feature requires
 Home's device-local manager state.
 
-Notify is at QAVS `1.5.0`: `1.5` is the minimum Qortium platform level this
+Notify is at QAVS `1.5.1`: `1.5` is the minimum Qortium platform level this
 first release is built against, and the patch number is the app's own free
 running release counter from here on. `vite.config.ts` reads `package.json`,
 injects the visible version, and emits `dist/qortium-app.json` with the name

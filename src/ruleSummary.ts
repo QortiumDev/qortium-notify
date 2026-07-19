@@ -1,4 +1,5 @@
 import type { MessageKey, TranslateFunction } from './i18n';
+import { ADDRESS_FILTER_KEYS, isLikelyQortalAddress } from './identity';
 import type { NotificationEvent, NotificationManagerApp, NotificationManagerRule } from './notificationManager';
 
 // Pure display transforms over the sanitized summary Home hands back — no
@@ -60,22 +61,50 @@ export function formatAppDisplayName(appKey: string): string {
   return parts.identifier ? `${parts.name} / ${parts.identifier}` : parts.name;
 }
 
+const ADDRESS_FILTER_KEY_SET = new Set<string>(ADDRESS_FILTER_KEYS);
+
+/** True for the four filter keys Home may expose as validated Qortal addresses. */
+export function isAddressFilterKey(key: string): boolean {
+  return ADDRESS_FILTER_KEY_SET.has(key);
+}
+
 export type VisibleFilterEntry = {
+  isAddressFilter: boolean;
   key: string;
   masked: boolean;
+  partiallyMasked: boolean;
   value?: boolean | number | string | string[];
 };
 
 /** Merges visible filter values with Home's `maskedFilterKeys` into one sorted, renderable list. */
 export function getVisibleFilterEntries(rule: NotificationManagerRule): VisibleFilterEntry[] {
+  const partiallyMaskedKeys = new Set(rule.partiallyMaskedFilterKeys ?? []);
   const visible: VisibleFilterEntry[] = Object.entries(rule.filters).map(([key, value]) => ({
+    isAddressFilter: isAddressFilterKey(key),
     key,
     masked: false,
+    partiallyMasked: partiallyMaskedKeys.has(key),
     value,
   }));
-  const masked: VisibleFilterEntry[] = rule.maskedFilterKeys.map((key) => ({ key, masked: true }));
+  const masked: VisibleFilterEntry[] = rule.maskedFilterKeys.map((key) => ({
+    isAddressFilter: isAddressFilterKey(key),
+    key,
+    masked: true,
+    partiallyMasked: false,
+  }));
 
   return [...visible, ...masked].sort((left, right) => left.key.localeCompare(right.key));
+}
+
+/** Address-shaped values out of one visible (non-masked) address-filter entry, in original order. */
+export function getEntryAddresses(entry: VisibleFilterEntry): string[] {
+  if (entry.masked || !entry.isAddressFilter || entry.value === undefined) {
+    return [];
+  }
+
+  const values: unknown[] = Array.isArray(entry.value) ? entry.value : [entry.value];
+
+  return values.filter(isLikelyQortalAddress);
 }
 
 /** Stable sort by display name so re-fetches don't reshuffle the list under the user. */
