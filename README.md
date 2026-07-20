@@ -52,7 +52,7 @@ actions above. Notify has no useful standalone-browser mode: opening it
 outside Home shows an explanatory card, since every real feature requires
 Home's device-local manager state.
 
-Notify is at QAVS `1.5.1`: `1.5` is the minimum Qortium platform level this
+Notify is at QAVS `1.5.2`: `1.5` is the minimum Qortium platform level this
 first release is built against, and the patch number is the app's own free
 running release counter from here on. `vite.config.ts` reads `package.json`,
 injects the visible version, and emits `dist/qortium-app.json` with the name
