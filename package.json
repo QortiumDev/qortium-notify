@@ -1,6 +1,6 @@
 {
   "name": "qortium-notify",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "private": true,
   "license": "0BSD",
   "description": "A QDN notification settings and subscription manager for Qortium Home.",

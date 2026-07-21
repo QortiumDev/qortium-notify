@@ -40,6 +40,7 @@ import {
   subscribeToNotificationManagerChanged,
   type NotificationManagerApp,
   type NotificationManagerSummary,
+  type NotificationEvent,
 } from './notificationManager';
 import { getBridgeState, hasAction, isStaleRevisionError, type BridgeState } from './qdnRequest';
 import { readSelectedAppFromLocation, subscribeToPopState, writeSelectedAppToLocation } from './routes';
@@ -57,6 +58,10 @@ import {
 } from './ruleSummary';
 
 const emptyBridgeState: BridgeState = { actions: [], isHomeBridge: false, ui: 'BROWSER_DEV' };
+
+export function getForeignPaymentPrivacyNotice(event: NotificationEvent, t: TranslateFunction) {
+  return event === 'FOREIGN_PAYMENT_RECEIVED' ? t('detail.foreignPaymentPrivacy') : null;
+}
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -376,6 +381,7 @@ function RuleCard({
   t: TranslateFunction;
 }) {
   const filterEntries = getVisibleFilterEntries(rule);
+  const foreignPaymentPrivacyNotice = getForeignPaymentPrivacyNotice(rule.event, t);
 
   return (
     <li className="rule-card">
@@ -394,6 +400,7 @@ function RuleCard({
           {t('detail.created', { date: formatRelativeTime(rule.createdAt, now, language) })}
         </span>
       </div>
+      {foreignPaymentPrivacyNotice ? <p className="rule-card__meta">{foreignPaymentPrivacyNotice}</p> : null}
       {rule.text ? <p className="rule-card__meta">{rule.text}</p> : null}
       {rule.link ? (
         <p className="rule-card__link">

@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { createTranslator, isRtlLanguage, normalizeLanguage, translatePlural } from './i18n';
+import {
+  createTranslator,
+  isRtlLanguage,
+  normalizeLanguage,
+  SUPPORTED_LANGUAGES,
+  translatePlural,
+} from './i18n';
+import { CATALOGS, MESSAGE_KEYS } from './locales/catalogs';
+import { EN_STRINGS } from './locales/en';
 
 describe('normalizeLanguage', () => {
   it('maps regional variants to their supported base language', () => {
@@ -32,16 +40,40 @@ describe('createTranslator', () => {
     expect(t('grant.grantedAt', { date: 'today' })).toBe('Granted today');
   });
 
-  it('falls back to English for a supported language without its own catalog', () => {
+  it('uses a real catalog for supported non-English languages', () => {
     const t = createTranslator('fr');
 
-    expect(t('app.title')).toBe('Qortium Notify');
+    expect(t('action.refresh')).not.toBe(EN_STRINGS['action.refresh']);
   });
 
   it('falls back to English for an unsupported language tag', () => {
     const t = createTranslator('xx-YY');
 
     expect(t('app.title')).toBe('Qortium Notify');
+  });
+});
+
+describe('locale catalogs', () => {
+  it('has a complete, nonblank catalog for every supported non-English language', () => {
+    const expectedLanguages = SUPPORTED_LANGUAGES.filter((language) => language !== 'en').sort();
+    expect(Object.keys(CATALOGS).sort()).toEqual(expectedLanguages);
+
+    for (const [language, catalog] of Object.entries(CATALOGS)) {
+      expect(Object.keys(catalog), language).toEqual(MESSAGE_KEYS);
+      for (const key of MESSAGE_KEYS) {
+        expect(catalog[key].trim(), `${language}:${key}`).not.toBe('');
+      }
+    }
+  });
+
+  it('preserves every interpolation placeholder exactly', () => {
+    const tokens = (value: string) => (value.match(/\{\w+\}/g) ?? []).sort();
+
+    for (const [language, catalog] of Object.entries(CATALOGS)) {
+      for (const key of MESSAGE_KEYS) {
+        expect(tokens(catalog[key]), `${language}:${key}`).toEqual(tokens(EN_STRINGS[key]));
+      }
+    }
   });
 });
 
