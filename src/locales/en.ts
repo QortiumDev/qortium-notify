@@ -59,6 +59,8 @@ export const EN_STRINGS = {
   'detail.rulesTitle': 'Background rules',
   'detail.rulesEmpty': 'This app has a notification grant but no background rules right now.',
   'detail.rulesEmptyNoGrant': 'This app has no notification grant or background rules.',
+  'detail.foreignPaymentPrivacy':
+    'Foreign-coin rules share a watch-only wallet view (address history, never spending) with this Core node.',
   'detail.maskedFilters': 'Home hides some filter values from Notify:',
   'detail.maskedFilterChip': '{key}: hidden',
   'detail.partiallyMaskedFilterChip': '+ hidden',

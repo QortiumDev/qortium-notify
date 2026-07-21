@@ -1,9 +1,10 @@
 import { EN_STRINGS } from './locales/en';
+import { CATALOGS } from './locales/catalogs';
 
 export type MessageValues = Record<string, string | number>;
 
-// Full Home language list so display-settings sync and RTL detection stay in
-// step with the host even though only English copy ships in v1 (see README).
+// Full Home language list keeps display-settings sync and RTL detection in
+// step with the host. Every listed non-English language has a static catalog.
 export const SUPPORTED_LANGUAGES = [
   'ar',
   'de',
@@ -33,15 +34,11 @@ export const SUPPORTED_LANGUAGES = [
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 export type MessageKey = keyof typeof EN_STRINGS;
-type MessageCatalog = { [key in MessageKey]: string };
+export type MessageCatalog = { [key in MessageKey]: string };
 
 const SUPPORTED_LANGUAGE_SET = new Set<string>(SUPPORTED_LANGUAGES);
 const RTL_LANGUAGES = new Set<string>(['ar', 'he']);
 const DEFAULT_LANGUAGE: SupportedLanguage = 'en';
-
-// Non-English catalogs are intentionally omitted for now; the translator
-// falls back to English for every key they would have overridden.
-const CATALOGS: { [locale in SupportedLanguage]?: Partial<MessageCatalog> } = {};
 
 function normalizeRawLanguage(language: string) {
   return language.trim().replace(/_/g, '-').toLowerCase();
@@ -107,7 +104,7 @@ function interpolate(message: string, values?: MessageValues) {
 
 export function createTranslator(language: string | undefined) {
   const locale = normalizeLanguage(language) ?? DEFAULT_LANGUAGE;
-  const catalog: MessageCatalog = { ...EN_STRINGS, ...CATALOGS[locale] } as MessageCatalog;
+  const catalog = locale === DEFAULT_LANGUAGE ? EN_STRINGS : CATALOGS[locale as Exclude<SupportedLanguage, 'en'>];
 
   return function translate(key: MessageKey, values?: MessageValues) {
     return interpolate(catalog[key] ?? EN_STRINGS[key], values);

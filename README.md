@@ -52,7 +52,7 @@ actions above. Notify has no useful standalone-browser mode: opening it
 outside Home shows an explanatory card, since every real feature requires
 Home's device-local manager state.
 
-Notify is at QAVS `1.5.2`: `1.5` is the minimum Qortium platform level this
+Notify is at QAVS `1.5.3`: `1.5` is the minimum Qortium platform level this
 first release is built against, and the patch number is the app's own free
 running release counter from here on. `vite.config.ts` reads `package.json`,
 injects the visible version, and emits `dist/qortium-app.json` with the name
@@ -66,12 +66,10 @@ applied.
 
 ## i18n
 
-Notify ships with a full `createTranslator`/`SUPPORTED_LANGUAGES` scaffold
-(the same shape as Help, Trust, and Chat) so it follows Home's language and
-RTL settings correctly, but only the English catalog (`src/locales/en.ts`) is
-populated for this first release — every other supported language currently
-falls back to English. Porting real translations from a sibling app's
-`src/locales/*.ts` files is a natural follow-up.
+Notify ships complete static catalogs for every language supported by Home,
+including Arabic and Hebrew RTL layouts. The catalog test requires every
+language to contain every message key and preserve interpolation placeholders.
+Unsupported language tags still fall back safely to English.
 
 ## Development and verification
 
