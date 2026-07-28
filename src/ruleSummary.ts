@@ -25,12 +25,15 @@ export function formatEventLabel(event: NotificationEvent, translate?: Translate
   return translate ? translate(EVENT_LABEL_KEYS[event]) : (EVENT_LABELS[event] ?? event);
 }
 
-const QDN_APP_KEY_PATTERN = /^qdn:\/\/(APP|WEBSITE)\/([^/?#]+)\/?([^/?#]*)$/i;
+// APP, WEBSITE and GAME are the services Home hosts as browser content, so a
+// notification rule can belong to any of them. Keep in parity with
+// qortium-home/electron/qdn-browser-archive-services.ts.
+const QDN_APP_KEY_PATTERN = /^qdn:\/\/(APP|WEBSITE|GAME)\/([^/?#]+)\/?([^/?#]*)$/i;
 
 export type AppKeyParts = {
   identifier: string | null;
   name: string;
-  service: 'APP' | 'WEBSITE';
+  service: 'APP' | 'WEBSITE' | 'GAME';
 };
 
 /** Parses a manager `appKey` into its display parts, or null if malformed. */
@@ -44,7 +47,7 @@ export function parseAppKey(appKey: string): AppKeyParts | null {
   const [, service, name, identifier] = match;
 
   return {
-    service: service.toUpperCase() as 'APP' | 'WEBSITE',
+    service: service.toUpperCase() as AppKeyParts['service'],
     name,
     identifier: identifier && identifier !== name ? identifier : null,
   };
