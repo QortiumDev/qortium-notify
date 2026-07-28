@@ -55,6 +55,13 @@ describe('parseAppKey', () => {
 
   it('drops the identifier when it duplicates the name (the common APP/Name/Name case)', () => {
     expect(parseAppKey('qdn://APP/Chat/Chat')).toEqual({ service: 'APP', name: 'Chat', identifier: null });
+    // GAME is hosted as browser content like APP and WEBSITE, so a rule may belong to one.
+    expect(parseAppKey('qdn://GAME/QortiumHomeTest/shell-game')).toEqual({
+      service: 'GAME',
+      name: 'QortiumHomeTest',
+      identifier: 'shell-game',
+    });
+    expect(parseAppKey('qdn://game/QortiumHomeTest/shell-game')?.service).toBe('GAME');
   });
 
   it('returns null for a malformed key', () => {
