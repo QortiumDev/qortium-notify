@@ -5,6 +5,7 @@ import {
   Check,
   ChevronLeft,
   Copy,
+  Code2,
   Loader2,
   RefreshCw,
   ShieldCheck,
@@ -34,6 +35,7 @@ import {
   getChangedRevisionFromMessage,
   isCurrentNotificationManagerResponse,
   NOTIFICATION_MANAGER_ACTIONS,
+  HOME_SETTINGS_ACTIONS_FOR_NOTIFY,
   removeAppRules,
   revokeApp,
   setAppMuted,
@@ -43,7 +45,8 @@ import {
   type NotificationEvent,
 } from './notificationManager';
 import { getBridgeState, hasAction, isStaleRevisionError, type BridgeState } from './qdnRequest';
-import { readSelectedAppFromLocation, subscribeToPopState, writeSelectedAppToLocation } from './routes';
+import { readSelectedAppFromLocation, readWorkspaceFromLocation, subscribeToPopState, writeSelectedAppToLocation, writeWorkspaceToLocation, type NotifyWorkspace } from './routes';
+import { Reference } from './Reference';
 import {
   canMuteApp,
   countGrantedApps,
@@ -448,6 +451,7 @@ function RuleCard({
 
 export default function App() {
   const [initialAppKey] = useState(readSelectedAppFromLocation);
+  const [workspace, setWorkspace] = useState<NotifyWorkspace>(readWorkspaceFromLocation);
   const [displaySettings, setDisplaySettings] = useState<QdnDisplaySettings>(getInitialDisplaySettings);
   const t = useMemo(() => createTranslator(displaySettings.language), [displaySettings.language]);
   const [bridgeState, setBridgeState] = useState<BridgeState>(emptyBridgeState);
@@ -480,7 +484,7 @@ export default function App() {
     [bridgeState.actions],
   );
   const homeSettingsSupported = useMemo(
-    () => hasAction(bridgeState.actions, 'GET_HOME_SETTINGS') && hasAction(bridgeState.actions, 'UPDATE_HOME_SETTINGS'),
+    () => hasEveryAction(bridgeState.actions, HOME_SETTINGS_ACTIONS_FOR_NOTIFY),
     [bridgeState.actions],
   );
   const identityResolutionSupported = useMemo(
@@ -541,7 +545,11 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    return subscribeToPopState(setSelectedAppKey);
+    if (readWorkspaceFromLocation() === 'developers') writeWorkspaceToLocation('developers', false);
+    return subscribeToPopState((appKey) => {
+      setSelectedAppKey(appKey);
+      setWorkspace(readWorkspaceFromLocation());
+    });
   }, []);
 
   useEffect(() => {
@@ -840,7 +848,7 @@ export default function App() {
           </div>
         </div>
         <div className="topbar__actions">
-          {homeSettingsSupported && globalEnabled !== null ? (
+          {workspace === 'manager' && homeSettingsSupported && globalEnabled !== null ? (
             <div className="toggle-row">
               <span className="toggle-row__label">{t('global.title')}</span>
               <Switch
@@ -851,7 +859,7 @@ export default function App() {
               />
             </div>
           ) : null}
-          {permissionGranted ? (
+          {workspace === 'manager' && permissionGranted ? (
             <IconButton
               busy={summaryLoading}
               icon={<RefreshCw aria-hidden />}
@@ -861,6 +869,19 @@ export default function App() {
           ) : null}
         </div>
       </header>
+
+      <nav className="workspace-tabs" aria-label={t('app.title')}>
+        {([
+          ['manager', t('global.title'), Bell],
+          ['developers', t('nav.developers'), Code2],
+        ] as const).map(([id, label, Icon]) => <button key={id} type="button"
+          aria-current={workspace === id ? 'page' : undefined}
+          className={`workspace-tab${workspace === id ? ' workspace-tab--active' : ''}`}
+          onClick={() => { writeWorkspaceToLocation(id, true); setWorkspace(id); }}>
+          <Icon aria-hidden /><span>{label}</span>
+        </button>)}
+      </nav>
+      {workspace === 'developers' ? <Reference /> : <>
 
       {!bridgeLoaded ? (
         <div className="empty-state empty-state--loading">
@@ -1053,6 +1074,8 @@ export default function App() {
           ) : null}
         </>
       ) : null}
+
+      </>}
 
       {confirmRevokeTarget ? (
         <ConfirmDialog

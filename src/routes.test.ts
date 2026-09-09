@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   buildLocationForSelectedApp,
+  buildLocationForWorkspace,
+  readWorkspaceFromLocation,
+  writeWorkspaceToLocation,
   readSelectedAppFromLocation,
   subscribeToPopState,
   writeSelectedAppToLocation,
@@ -79,5 +82,33 @@ describe('subscribeToPopState', () => {
     expect(listener).not.toHaveBeenCalled();
 
     window.history.replaceState(null, '', '/');
+  });
+});
+
+
+describe('workspace routing', () => {
+  afterEach(() => { window.history.replaceState(null, '', '/'); vi.restoreAllMocks(); });
+  it.each(['developers', 'developer', 'reference'])('recognizes %s independently of an app detail', view => {
+    expect(readWorkspaceFromLocation({ search: `?app=qdn://APP/Example/Example&view=${view}` })).toBe('developers');
+  });
+  it('canonicalizes aliases without dropping app, repeated host parameters or fragment', () => {
+    window.history.replaceState({ host: 3 }, '', '/render/APP/Notify/Notify?view=reference&app=example&future=a&future=b&section=summary#retained');
+    writeWorkspaceToLocation('developers', false);
+    expect(window.history.state).toEqual({ host: 3 });
+    expect(new URLSearchParams(location.search).getAll('future')).toEqual(['a', 'b']);
+    expect(new URLSearchParams(location.search).get('app')).toBe('example');
+    expect(location.hash).toBe('#retained');
+    expect(new URLSearchParams(location.search).get('view')).toBe('developers');
+    const push = vi.spyOn(window.history, 'pushState');
+    writeWorkspaceToLocation('developers', true);
+    expect(push).not.toHaveBeenCalled();
+    writeWorkspaceToLocation('manager', true);
+    expect(push).toHaveBeenCalledOnce();
+    expect(location.search).toBe('?app=example&future=a&future=b');
+  });
+  it('retains developer routing when a background mutation clears the selected app', () => {
+    const next = buildLocationForSelectedApp({ pathname: '/', search: '?view=developers&section=mutations&app=example', hash: '#host' }, null);
+    expect(next).toBe('/?view=developers&section=mutations#host');
+    expect(buildLocationForWorkspace({ pathname: '/', search: '?app=example', hash: '#host' }, 'developers')).toBe('/?app=example&view=developers#host');
   });
 });

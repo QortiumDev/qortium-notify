@@ -87,4 +87,5 @@ export const EN_STRINGS = {
     'Another view or Home itself changed these settings. Refresh to see the current state before trying again.',
 
   'a11y.closeDialog': 'Close dialog',
+  'nav.developers': 'Developers',
 } as const;

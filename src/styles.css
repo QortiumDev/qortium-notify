@@ -1101,3 +1101,26 @@ svg {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Developers shares the app appearance and has its own scroll container. */
+.workspace-tabs { display: flex; flex-wrap: wrap; gap: 8px; flex: none; padding: 12px clamp(14px, 3vw, 28px); background: var(--qn-surface); border-bottom: 1px solid var(--qn-border); }
+.workspace-tab { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; min-height: 44px; border: 1px solid var(--qn-border); border-radius: var(--qn-radius); background: var(--qn-control); color: var(--qn-text-primary); font: inherit; overflow-wrap: anywhere; }
+.workspace-tab--active { background: var(--qn-accent-soft); border-color: var(--qn-accent); }
+.workspace-tab svg { width: 1.1em; height: 1.1em; flex: none; }
+.workspace-tab:focus-visible, .reference a:focus-visible, .reference section:focus-visible { outline: 3px solid var(--qn-accent); outline-offset: 2px; }
+.reference { display: flex; flex-direction: column; flex: 1 0 auto; width: 100%; max-width: 1240px; margin: 0 auto; min-width: 0; background: var(--qn-surface); }
+.reference-header { padding: 16px clamp(14px, 3vw, 28px); }
+.reference-header h2 { margin: 0 0 8px; font-size: var(--qn-text-heading); }
+.reference-toc { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 8px 0; }
+.reference a { color: var(--qn-accent); overflow-wrap: anywhere; }
+.reference-scroll { max-height: 65dvh; min-height: 220px; overflow: auto; overscroll-behavior: contain; padding: 16px clamp(14px, 3vw, 28px); border-top: 1px solid var(--qn-border); }
+.reference section { scroll-margin-top: 12px; margin-bottom: 32px; min-width: 0; }
+.reference h3 { font-size: 1.2em; margin-top: 0; }
+.reference p, .reference li, .reference dd { line-height: 1.6; overflow-wrap: anywhere; }
+.reference dt { font-weight: 700; margin-top: 12px; overflow-wrap: anywhere; }
+.reference dd { margin: 4px 0 12px; }
+.reference code { font-family: ui-monospace, monospace; overflow-wrap: anywhere; }
+.reference pre { background: var(--qn-control); border: 1px solid var(--qn-border); border-radius: var(--qn-radius); padding: 12px; max-width: 100%; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+.reference pre code { font-size: .85em; }
+.reference .copy-status { font-size: var(--qn-text-small); }
+.reference-example { min-width: 0; margin: 18px 0; }

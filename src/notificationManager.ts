@@ -5,12 +5,12 @@ import { qdnRequest } from './qdnRequest';
 // invents its own copy of this data — every read is a fresh sanitized
 // snapshot from Home, and every mutation round-trips the current revision.
 
-export type NotificationEvent =
-  | 'RESOURCE_PUBLISHED'
-  | 'PAYMENT_RECEIVED'
-  | 'CHAT_MESSAGE'
-  | 'TRANSACTION_CONFIRMED'
-  | 'FOREIGN_PAYMENT_RECEIVED';
+export const NOTIFICATION_SUMMARY_VERSION = 1 as const;
+export const NOTIFICATION_EVENTS = [
+  'RESOURCE_PUBLISHED', 'PAYMENT_RECEIVED', 'CHAT_MESSAGE',
+  'TRANSACTION_CONFIRMED', 'FOREIGN_PAYMENT_RECEIVED',
+] as const;
+export type NotificationEvent = typeof NOTIFICATION_EVENTS[number];
 
 export type NotificationFilters = Record<string, boolean | number | string | string[]>;
 
@@ -43,7 +43,7 @@ export type NotificationManagerApp = {
 export type NotificationManagerSummary = {
   apps: NotificationManagerApp[];
   revision: number;
-  version: 1;
+  version: typeof NOTIFICATION_SUMMARY_VERSION;
 };
 
 export const NOTIFICATION_MANAGER_ACTIONS = [
@@ -63,7 +63,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 export function isNotificationManagerSummary(value: unknown): value is NotificationManagerSummary {
   return (
     isRecord(value) &&
-    value.version === 1 &&
+    value.version === NOTIFICATION_SUMMARY_VERSION &&
     Number.isSafeInteger(value.revision) &&
     (value.revision as number) >= 0 &&
     Array.isArray(value.apps)
