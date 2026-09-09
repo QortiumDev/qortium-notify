@@ -74,6 +74,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "قام عرض آخر أو الصفحة الرئيسية نفسها بتغيير هذه الإعدادات. قم بالتحديث لرؤية الحالة الحالية قبل المحاولة مرة أخرى.",
     "إغلاق مربع الحوار",
     // ar translations
+    "المطورون",
   ],
   de: [
     "Qortium-Benachrichtigung",
@@ -143,6 +144,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Eine andere Ansicht oder die Startseite selbst hat diese Einstellungen geändert. Aktualisieren Sie, um den aktuellen Status anzuzeigen, bevor Sie es erneut versuchen.",
     "Dialog schließen",
     // de translations
+    "Entwickler",
   ],
   el: [
     "Qortium Notify",
@@ -212,6 +214,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Μια άλλη προβολή ή η ίδια η Αρχική σελίδα άλλαξε αυτές τις ρυθμίσεις. Κάντε ανανέωση για να δείτε την τρέχουσα κατάσταση πριν προσπαθήσετε ξανά.",
     "Κλείσιμο διαλόγου",
     // el translations
+    "Προγραμματιστές",
   ],
   es: [
     "Notificar Qortium",
@@ -281,6 +284,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Otra vista o el propio Inicio cambiaron esta configuración. Actualice para ver el estado actual antes de volver a intentarlo.",
     "Cerrar diálogo",
     // es translations
+    "Desarrolladores",
   ],
   et: [
     "Qortium Teavita",
@@ -350,6 +354,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Teine vaade või Kodu ise muutis neid seadeid. Enne uuesti proovimist värskendage hetkeoleku nägemiseks.",
     "Sule dialoog",
     // et translations
+    "Arendajad",
   ],
   fi: [
     "Qortium Notify",
@@ -419,6 +424,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Toinen näkymä tai koti itse muutti nämä asetukset. Päivitä nähdäksesi nykyinen tila ennen kuin yrität uudelleen.",
     "Sulje valintaikkuna",
     // fi translations
+    "Kehittäjät",
   ],
   fr: [
     "Notifier Qortium",
@@ -488,6 +494,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Une autre vue ou Accueil elle-même a modifié ces paramètres. Actualisez pour voir l’état actuel avant de réessayer.",
     "Fermer la boîte de dialogue",
     // fr translations
+    "Développeurs",
   ],
   he: [
     "הודעה על קורטיום",
@@ -557,6 +564,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "תצוגה אחרת או הבית עצמו שינו את ההגדרות הללו. רענן כדי לראות את המצב הנוכחי לפני שתנסה שוב.",
     "סגור דו-שיח",
     // he translations
+    "מפתחים",
   ],
   hi: [
     "क्वॉर्टियम सूचित करें",
@@ -626,6 +634,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "किसी अन्य दृश्य या होम ने ही इन सेटिंग्स को बदल दिया। पुनः प्रयास करने से पहले वर्तमान स्थिति देखने के लिए ताज़ा करें।",
     "संवाद बंद करें",
     // hi translations
+    "डेवलपर",
   ],
   hu: [
     "Qortium Notify",
@@ -695,6 +704,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Egy másik nézet vagy maga a Kezdőlap megváltoztatta ezeket a beállításokat. Frissítsen az aktuális állapot megtekintéséhez, mielőtt újra próbálkozna.",
     "Párbeszéd bezárása",
     // hu translations
+    "Fejlesztők",
   ],
   it: [
     "Notifica Qortium",
@@ -764,6 +774,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Un'altra vista o la stessa Home hanno modificato queste impostazioni. Aggiorna per vedere lo stato corrente prima di riprovare.",
     "Chiudi la finestra di dialogo",
     // it translations
+    "Sviluppatori",
   ],
   ja: [
     "クォーティアム通知",
@@ -833,6 +844,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "別のビューまたはホーム自体がこれらの設定を変更しました。再試行する前に、更新して現在の状態を確認してください。",
     "ダイアログを閉じる",
     // ja translations
+    "開発者",
   ],
   ko: [
     "Qortium 알림",
@@ -902,6 +914,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "다른 보기 또는 홈 자체가 이러한 설정을 변경했습니다. 다시 시도하기 전에 새로고침하여 현재 상태를 확인하세요.",
     "대화상자 닫기",
     // ko translations
+    "개발자",
   ],
   nb: [
     "Qortium varsle",
@@ -971,6 +984,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "En annen visning eller Home selv endret disse innstillingene. Oppdater for å se gjeldende tilstand før du prøver igjen.",
     "Lukk dialog",
     // nb translations
+    "Utviklere",
   ],
   nl: [
     "Qortium op de hoogte",
@@ -1040,6 +1054,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Een andere weergave of Home zelf heeft deze instellingen gewijzigd. Vernieuw om de huidige status te zien voordat u het opnieuw probeert.",
     "Dialoogvenster sluiten",
     // nl translations
+    "Ontwikkelaars",
   ],
   pl: [
     "Qortium Powiadom",
@@ -1109,6 +1124,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Inny widok lub sam Dom zmienił te ustawienia. Odśwież, aby zobaczyć bieżący stan, zanim spróbujesz ponownie.",
     "Zamknij okno dialogowe",
     // pl translations
+    "Deweloperzy",
   ],
   pt: [
     "Notificação Qórtium",
@@ -1178,6 +1194,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Outra visualização ou a própria página inicial alteraram essas configurações. Atualize para ver o estado atual antes de tentar novamente.",
     "Fechar caixa de diálogo",
     // pt translations
+    "Desenvolvedores",
   ],
   ro: [
     "Notificare Qortium",
@@ -1247,6 +1264,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "O altă vizualizare sau Acasă în sine a schimbat aceste setări. Actualizează pentru a vedea starea curentă înainte de a încerca din nou.",
     "Închide caseta de dialog",
     // ro translations
+    "Dezvoltatori",
   ],
   ru: [
     "Кортиум Уведомить",
@@ -1316,6 +1334,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "Другой вид или главная страница изменили эти настройки. Обновите, чтобы увидеть текущее состояние, прежде чем повторить попытку.",
     "Закрыть диалог",
     // ru translations
+    "Разработчики",
   ],
   sv: [
     "Qortium Notify",
@@ -1385,6 +1404,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "En annan vy eller Home själv ändrade dessa inställningar. Uppdatera för att se aktuell status innan du försöker igen.",
     "Stäng dialogrutan",
     // sv translations
+    "Utvecklare",
   ],
   'zh-CN': [
     "Qortium 通知",
@@ -1454,6 +1474,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "另一个视图或主页本身更改了这些设置。重试之前刷新以查看当前状态。",
     "关闭对话框",
     // zh-CN translations
+    "开发者",
   ],
   'zh-TW': [
     "Qortium 通知",
@@ -1523,6 +1544,7 @@ const LOCALIZED_VALUES: Record<Exclude<SupportedLanguage, 'en'>, string[]> = {
     "另一個視圖或主頁本身更改了這些設定。重試之前刷新以查看目前狀態。",
     "關閉對話框",
     // zh-TW translations
+    "開發者",
   ],
 };
 

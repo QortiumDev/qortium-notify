@@ -8,7 +8,8 @@ capability. This document maps each `qdnRequest` action to where it's used in
 
 `SHOW_ACTIONS` must include every action in
 `NOTIFICATION_MANAGER_ACTIONS` (`src/notificationManager.ts`) before Notify
-shows anything but the "needs a newer Home" card:
+enables the manager workspace. Developers remains accessible on older hosts
+and outside Home:
 
 - `NOTIFICATION_MANAGER_HAS_PERMISSION`
 - `NOTIFICATION_MANAGER_GET`
@@ -56,7 +57,7 @@ user must retry the action once the fresh data is visible.
 the desktop `qortiumNotificationManagerChanged` window event. Android sends
 the equivalent `{ type: 'qortium:notification-manager-changed', detail }`
 message; Notify source-checks it and forwards only its revision into the same
-handler. Both forms carry a version number, not data. Notify rejects
+handler. Both forms carry a revision number, not data. Notify rejects
 out-of-order responses and treats a newer revision as "go refetch", not as
 something to diff or merge itself.
 
@@ -77,9 +78,10 @@ implying the array is complete.
 
 ## Address filter identity resolution
 
-The four address filter keys above are the only filter values Notify ever
-receives unmasked, and only once Home has validated them as Qortal
-addresses. `src/identity.ts` gathers every such address across the current
+The four address filter keys above may remain visible once Home validates
+them as Q-addresses (the shared address format). Non-sensitive filters such
+as resource service/name and coin can also remain visible; this does not
+imply any Qortal app integration. `src/identity.ts` gathers every such address across the current
 summary (`extractAddressesFromSummary`), deduplicates, and resolves them
 through `RESOLVE_IDENTITIES` in batches of at most 500
 (`resolveIdentities`/`chunkAddresses`) — Home's existing action, shared with
@@ -107,3 +109,24 @@ through `GET_HOME_SETTINGS` / `UPDATE_HOME_SETTINGS`. The read supplies the
 initial theme, accent, language, text size, and UI style; desktop
 `qortiumHomeSettingsChanged`, Android `qortium:home-settings-changed`, and
 legacy display messages keep those host-owned values current.
+
+
+## Developers workspace (1.5.6)
+
+The primary user-facing reference is `src/Reference.tsx`, linked from the
+always-available Developers tab. It imports the adapter action/event/version
+constants and the identity allowlist/batch size to reduce documentation drift.
+Examples describe sanitized manager summaries, not producer registrations.
+Manager support does not establish availability of producer/delivery backends.
+
+`src/routes.ts` handles the independent workspace and app-detail queries;
+`src/ReferenceNavigation.tsx` uses a `section` query under Core's injected base,
+preserving app selection, repeated/unknown parameters, fragments and host
+history state. Switching workspaces does not remount App's manager state.
+The English/LTR reference follows Home appearance, and copy buttons announce
+success or manual-copy fallback without executing examples.
+
+Home 2 validates the revision before mutations and fails closed for corrupt
+or unavailable notification stores. Home settings approval is independent of
+`notifications.manage`. Sanitization hides account bindings and sensitive
+filters; optional free-text title/text/link fields are still visible.

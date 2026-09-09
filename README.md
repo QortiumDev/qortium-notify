@@ -38,6 +38,7 @@ notifications switch.
   those, and Notify shows each as a published name/avatar (falling back to
   the full address) resolved through `RESOLVE_IDENTITIES`, with the address
   always available as accessible text and a copy action.
+- A public English **Developers** workspace (`?view=developers`) with the manager contract, privacy boundaries, revision-safe examples, section links and accessible copy controls. It is available before permission and in standalone browsers.
 - Deep-linkable selection (`?app=<appKey>`), kept in sync with the browser
   History API so Home's address bar and Back/Forward track the open app
   detail view.
@@ -48,11 +49,11 @@ list/detail layout that stacks on narrow hosts.
 ## Runtime and QAVS
 
 Qortium Home supplies the `qdnRequest` bridge and the manager/Home-settings
-actions above. Notify has no useful standalone-browser mode: opening it
-outside Home shows an explanatory card, since every real feature requires
-Home's device-local manager state.
+actions above. The Developers reference works in standalone browsers; the
+App notifications workspace explains that managing device-local settings
+requires Home. Notify remains Qortium QDN only, with no Qortal app integration.
 
-Notify is at QAVS `1.5.3`: `1.5` is the minimum Qortium platform level this
+Notify is at QAVS `1.5.6`: `1.5` is the minimum Qortium platform level this
 first release is built against, and the patch number is the app's own free
 running release counter from here on. `vite.config.ts` reads `package.json`,
 injects the visible version, and emits `dist/qortium-app.json` with the name
@@ -103,7 +104,13 @@ to report `READY`.
 
 ## Contract reference
 
-See [`docs/NOTIFICATION_MANAGER.md`](docs/NOTIFICATION_MANAGER.md) for the
-exact bridge actions Notify uses and how each maps to a UI affordance. The
+Open **Developers** in Notify (`qdn://APP/Notify/Notify?view=developers`) for
+the in-app reference. `?view=developer` and `?view=reference` normalize to the
+same workspace. Switching tabs preserves `?app=...`; section links also
+preserve Home parameters and fragments, and support Back/Forward. The body
+remains English/LTR while the tab label follows Home language.
+
+See [`docs/NOTIFICATION_MANAGER.md`](docs/NOTIFICATION_MANAGER.md) for source
+pointers and how each action maps to a UI affordance. The
 authoritative source is Qortium Home's own `docs/HOME_DATA_MANAGERS.md` and
 `docs/APP_NOTIFICATIONS.md`.

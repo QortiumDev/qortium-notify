@@ -45,7 +45,7 @@ export function writeSelectedAppToLocation(appKey: string | null, push: boolean)
   const nextUrl = buildLocationForSelectedApp(window.location, appKey);
   const method = push ? 'pushState' : 'replaceState';
 
-  window.history[method](null, '', nextUrl);
+  window.history[method](window.history.state, '', nextUrl);
 }
 
 export function subscribeToPopState(listener: (appKey: string | null) => void): () => void {
@@ -58,4 +58,33 @@ export function subscribeToPopState(listener: (appKey: string | null) => void): 
   window.addEventListener('popstate', handler);
 
   return () => window.removeEventListener('popstate', handler);
+}
+
+export type NotifyWorkspace = 'manager' | 'developers';
+const DEVELOPER_ALIASES = ['developers', 'developer', 'reference'];
+
+/** The workspace is independent of the retained app-detail selection. */
+export function readWorkspaceFromLocation(location: Pick<Location, 'search'> = window.location): NotifyWorkspace {
+  return DEVELOPER_ALIASES.includes(new URLSearchParams(location.search).get('view') ?? '')
+    ? 'developers' : 'manager';
+}
+
+export function buildLocationForWorkspace(
+  location: Pick<Location, 'hash' | 'pathname' | 'search'>,
+  workspace: NotifyWorkspace,
+): string {
+  const params = new URLSearchParams(location.search);
+  if (workspace === 'developers') params.set('view', 'developers');
+  else {
+    params.delete('view');
+    params.delete('section');
+  }
+  const query = params.toString();
+  return `${location.pathname}${query ? `?${query}` : ''}${location.hash ?? ''}`;
+}
+
+export function writeWorkspaceToLocation(workspace: NotifyWorkspace, push: boolean) {
+  const next = buildLocationForWorkspace(window.location, workspace);
+  if (next === `${location.pathname}${location.search}${location.hash}`) return;
+  window.history[push ? 'pushState' : 'replaceState'](window.history.state, '', next);
 }
